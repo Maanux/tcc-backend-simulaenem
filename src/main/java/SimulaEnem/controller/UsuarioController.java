@@ -1,13 +1,13 @@
 package SimulaEnem.controller;
 
 import SimulaEnem.repository.UsuarioRepository;
-import SimulaEnem.usuario.Usuario;
-import org.apache.coyote.Response;
+import SimulaEnem.domain.usuario.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/usuarios")

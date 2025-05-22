@@ -1,4 +1,4 @@
-package SimulaEnem.usuario;
+package SimulaEnem.domain.usuario;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
