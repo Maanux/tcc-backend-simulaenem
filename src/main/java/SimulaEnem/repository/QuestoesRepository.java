@@ -13,4 +13,5 @@ public interface QuestoesRepository extends JpaRepository<Questoes, Long> {
     List<Questoes> findByDiscipline(String discipline);
 
     List<Questoes> findByLanguage(String language);
+
 }

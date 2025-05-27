@@ -2,7 +2,6 @@ package SimulaEnem.controller;
 
 import SimulaEnem.domain.questoes.Questoes;
 import SimulaEnem.repository.QuestoesRepository;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("questoes")
@@ -22,6 +22,11 @@ public class QuestoesController {
     @GetMapping
     public List<Questoes> listarQuestoes() {
         return questoesRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<?> listarPorId(@PathVariable Long id) {
+        return questoesRepository.findById(id);
     }
 
     @GetMapping("/ano/{year}")
@@ -38,5 +43,7 @@ public class QuestoesController {
     public List<Questoes> listarPorLinguagens(@PathVariable String language) {
         return questoesRepository.findByLanguage(language);
     }
+
+
 
 }

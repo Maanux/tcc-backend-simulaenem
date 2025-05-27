@@ -1,6 +1,8 @@
 package SimulaEnem.domain.alternativas;
 
 import SimulaEnem.domain.questoes.Questoes;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +21,9 @@ public class Alternativas {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "questao_id", nullable = false)
-    private Questoes questoes;
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnore
+    private Questoes questao;
     private char letter;
     @Column(columnDefinition = "TEXT")
     private String text;
