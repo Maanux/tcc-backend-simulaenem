@@ -1,13 +1,21 @@
 package SimulaEnem.controller;
 
+import SimulaEnem.dto.usuario.DadosAtualizacaoUsuario;
+import SimulaEnem.dto.usuario.DadosCadastroUsuario;
+import SimulaEnem.dto.usuario.DadosListagemUsuarios;
 import SimulaEnem.repository.UsuarioRepository;
 import SimulaEnem.domain.usuario.Usuario;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import SimulaEnem.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -15,17 +23,21 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            return ResponseEntity.badRequest().body("Email já está em uso.");
-        }
-        if (usuario.getTelefone() != null && usuarioRepository.existsByTelefone(usuario.getTelefone())) {
-            return ResponseEntity.badRequest().body("Telefone já está em uso.");
-        }
-        Usuario salvo = usuarioRepository.save(usuario);
-        return ResponseEntity.ok(salvo);
+    public ResponseEntity<?> cadastrar(@RequestBody @Valid DadosCadastroUsuario dados) {
+        var usuario = usuarioService.cadastrar(dados);
+        return ResponseEntity.ok(usuario);
+    }
+
+    @GetMapping("/teste")
+    public ResponseEntity<Page<DadosListagemUsuarios>> listarDados(@PageableDefault(size = 5, sort = {"nome"}) Pageable pageable) {
+        Page<Usuario> usuariosPage = usuarioRepository.findByAtivoTrue(pageable);
+        Page<DadosListagemUsuarios> dtoPage = usuariosPage.map(DadosListagemUsuarios::new);
+
+        return ResponseEntity.ok(dtoPage);
     }
 
     @GetMapping
@@ -41,27 +53,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Usuario novoUsuario) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            if (novoUsuario.getNome() != null) usuario.setNome(novoUsuario.getNome());
-            if (novoUsuario.getSobrenome() != null) usuario.setSobrenome(novoUsuario.getSobrenome());
-            if (novoUsuario.getEmail() != null && !novoUsuario.getEmail().equals(usuario.getEmail())) {
-                if (usuarioRepository.existsByEmail(novoUsuario.getEmail())) {
-                    return ResponseEntity.badRequest().body("Email já está em uso.");
-                }
-                usuario.setEmail(novoUsuario.getEmail());
-            }
-            if (novoUsuario.getTelefone() != null && !novoUsuario.getTelefone().equals(usuario.getTelefone())) {
-                if (usuarioRepository.existsByTelefone(novoUsuario.getTelefone())) {
-                    return ResponseEntity.badRequest().body("Telefone já está em uso.");
-                }
-                usuario.setTelefone(novoUsuario.getTelefone());
-            }
-            if (novoUsuario.getApelido() != null) usuario.setApelido(novoUsuario.getApelido());
-            if (novoUsuario.getSenha() != null) usuario.setSenha(novoUsuario.getSenha());
-
-            return ResponseEntity.ok(usuarioRepository.save(usuario));
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid DadosAtualizacaoUsuario dados) {
+        return usuarioService.atualizarUsuario(id, dados);
     }
 
     @DeleteMapping("/{id}")

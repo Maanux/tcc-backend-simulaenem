@@ -25,12 +25,9 @@ public class QuestaoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<QuestaoCompletaDTO> getQuestaoCompleta(@PathVariable Long id) {
-        System.out.println("Buscando questão id: " + id);
 
         var questao = questoesRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Questão não encontrada"));
-
-        System.out.println("Questão encontrada: " + questao.getTitle());
 
         var alternativas = alternativasRepository.findByQuestaoIdOrderByLetterAsc(id).stream()
                 .map(a -> new QuestaoCompletaDTO.AlternativaDTO(a.getLetter(), a.getText(), a.getFile(), a.isCorrect()))
