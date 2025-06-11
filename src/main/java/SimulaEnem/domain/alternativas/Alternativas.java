@@ -21,10 +21,10 @@ public class Alternativas {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "questao_id", nullable = false)
-//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @JsonIgnore
     private Questoes questao;
     private char letter;
+
     @Column(columnDefinition = "TEXT")
     private String text;
     private String file;

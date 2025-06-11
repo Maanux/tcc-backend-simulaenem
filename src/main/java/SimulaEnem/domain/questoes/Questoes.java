@@ -23,10 +23,12 @@ public class Questoes {
     private String discipline;
     private String language;
     private int year;
+    @Column(columnDefinition = "TEXT")
     private String context;
 
     @ElementCollection
     private List<String> files;
     private char correctAlternative;
+    @Column(columnDefinition = "TEXT")
     private String alternativesIntroduction;
 }

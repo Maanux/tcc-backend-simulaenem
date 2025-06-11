@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     List<Usuario> findByAtivoTrue();
@@ -18,4 +20,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByApelido(String apelido);
 
     Page<Usuario> findByAtivoTrue(Pageable pageable);
+
+    //testarpelo id externo
+
+    Optional<Usuario> findByExternalId(UUID externalId);
 }

@@ -30,17 +30,15 @@ public class UsuarioService {
             throw new ValidacaoException("Apelido já está em uso.");
         }
 
-        var usuario = new Usuario(
-                null,
-                dados.nome(),
-                dados.sobrenome(),
-                dados.email(),
-                dados.telefone(),
-                dados.apelido(),
-                dados.senha(),
-                true
-        );
-
+        var usuario = Usuario.builder()
+                .nome(dados.nome())
+                .sobrenome(dados.sobrenome())
+                .email(dados.email())
+                .telefone(dados.telefone())
+                .apelido(dados.apelido())
+                .senha(dados.senha())
+                .ativo(true)
+                .build();
         return usuarioRepository.save(usuario);
     }
 
