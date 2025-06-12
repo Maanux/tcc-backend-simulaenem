@@ -44,6 +44,4 @@ public class QuestoesController {
         return questoesRepository.findByLanguage(language);
     }
 
-
-
 }

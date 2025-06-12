@@ -1,5 +1,6 @@
 package SimulaEnem.domain.questoes;
 
+import SimulaEnem.domain.alternativas.Alternativas;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,4 +32,7 @@ public class Questoes {
     private char correctAlternative;
     @Column(columnDefinition = "TEXT")
     private String alternativesIntroduction;
+    @OneToMany(mappedBy = "questao", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Alternativas> alternativas;
+
 }

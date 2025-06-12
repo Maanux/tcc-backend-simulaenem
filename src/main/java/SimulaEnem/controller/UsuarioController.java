@@ -13,7 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,26 +33,19 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    //testar pelo external id
     @GetMapping("/{externalId}")
     public ResponseEntity<Usuario> listarUsuarioPorExternalId(@PathVariable UUID externalId) {
-        return usuarioRepository.findByExternalId(externalId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return usuarioService.buscarPorExternalId(externalId);
     }
-
 
     @GetMapping("/teste")
     public ResponseEntity<Page<DadosListagemUsuarios>> listarDados(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
-        Page<Usuario> usuariosPage = usuarioRepository.findByAtivoTrue(pageable);
-        Page<DadosListagemUsuarios> dtoPage = usuariosPage.map(DadosListagemUsuarios::new);
-
-        return ResponseEntity.ok(dtoPage);
+        return usuarioService.listarDadosPaginados(pageable);
     }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listar() {
-        return ResponseEntity.ok(usuarioRepository.findByAtivoTrue());
+        return usuarioService.listarAtivos();
     }
 
     @PutMapping("/{id}")
@@ -63,27 +55,12 @@ public class UsuarioController {
 
     @PutMapping("/reativar/{id}")
     public ResponseEntity<?> reativar(@PathVariable Long id) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setAtivo(true);
-            usuario.setDeletedAt(null);
-            usuarioRepository.save(usuario);
-            return ResponseEntity.ok().body(
-                    String.format("Usuário %s foi reativado com sucesso. Ativo: %s", usuario.getNome(), usuario.getAtivo())
-            );
-        }).orElse(ResponseEntity.notFound().build());
+        return usuarioService.reativar(id);
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> desativar(@PathVariable Long id) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setAtivo(false);
-            usuario.setDeletedAt(LocalDateTime.now());
-            usuarioRepository.save(usuario);
-            return ResponseEntity.ok().body(
-                    String.format("Usuário " + usuario.getNome() + " foi desativado com sucesso. Ativo: " + usuario.getAtivo())
-            );
-        }).orElse(ResponseEntity.notFound().build());
+        return usuarioService.desativar(id);
     }
 
 }

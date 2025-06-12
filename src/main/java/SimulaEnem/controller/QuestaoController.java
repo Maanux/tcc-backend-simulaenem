@@ -1,49 +1,23 @@
 package SimulaEnem.controller;
 
-import SimulaEnem.dto.QuestaoCompletaDTO;
-import SimulaEnem.repository.AlternativasRepository;
-import SimulaEnem.repository.QuestoesRepository;
-import org.springframework.http.HttpStatus;
+import SimulaEnem.dto.questao.QuestaoCompletaDTO;
+import SimulaEnem.service.QuestaoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("questaoCompleta")
 public class QuestaoController {
 
-    private final QuestoesRepository questoesRepository;
-    private final AlternativasRepository alternativasRepository;
+    private final QuestaoService questaoService;
 
-    public QuestaoController(QuestoesRepository questoesRepository, AlternativasRepository alternativasRepository) {
-        this.questoesRepository = questoesRepository;
-        this.alternativasRepository = alternativasRepository;
+    public QuestaoController(QuestaoService questaoService) {
+        this.questaoService = questaoService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<QuestaoCompletaDTO> getQuestaoCompleta(@PathVariable Long id) {
-
-        var questao = questoesRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Questão não encontrada"));
-
-        var alternativas = alternativasRepository.findByQuestaoIdOrderByLetterAsc(id).stream()
-                .map(a -> new QuestaoCompletaDTO.AlternativaDTO(a.getLetter(), a.getText(), a.getFile(), a.isCorrect()))
-                .toList();
-
-        var dto = new QuestaoCompletaDTO(
-                questao.getId(),
-                questao.getTitle(),
-                questao.getDiscipline(),
-                questao.getYear(),
-                questao.getContext(),
-                questao.getFiles(),
-                questao.getAlternativesIntroduction(),
-                alternativas
-        );
-
+        var dto = questaoService.buscarQuestaoCompletaPorId(id);
         return ResponseEntity.ok(dto);
     }
 }

@@ -1,9 +1,8 @@
-package SimulaEnem.dto;
+package SimulaEnem.dto.questao;
 
 import java.util.List;
 
 public record QuestaoCompletaDTO(
-        Long id,
         String title,
         String discipline,
         int year,

@@ -4,9 +4,16 @@ import SimulaEnem.domain.ValidacaoException;
 import SimulaEnem.domain.usuario.Usuario;
 import SimulaEnem.dto.usuario.DadosAtualizacaoUsuario;
 import SimulaEnem.dto.usuario.DadosCadastroUsuario;
+import SimulaEnem.dto.usuario.DadosListagemUsuarios;
 import SimulaEnem.repository.UsuarioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -75,4 +82,43 @@ public class UsuarioService {
             return ResponseEntity.ok(usuario);
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    public ResponseEntity<?> reativar(Long id) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setAtivo(true);
+            usuario.setDeletedAt(null);
+            usuarioRepository.save(usuario);
+            return ResponseEntity.ok().body(
+                    String.format("Usuário %s foi reativado com sucesso. Ativo: %s", usuario.getNome(), usuario.getAtivo())
+            );
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<?> desativar(Long id) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setAtivo(false);
+            usuario.setDeletedAt(LocalDateTime.now());
+            usuarioRepository.save(usuario);
+            return ResponseEntity.ok().body(
+                    String.format("Usuário %s foi desativado com sucesso. Ativo: %s", usuario.getNome(), usuario.getAtivo())
+            );
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<Usuario> buscarPorExternalId(UUID externalId) {
+        return usuarioRepository.findByExternalId(externalId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<List<Usuario>> listarAtivos() {
+        return ResponseEntity.ok(usuarioRepository.findByAtivoTrue());
+    }
+
+    public ResponseEntity<Page<DadosListagemUsuarios>> listarDadosPaginados(Pageable pageable) {
+        Page<Usuario> usuariosPage = usuarioRepository.findByAtivoTrue(pageable);
+        Page<DadosListagemUsuarios> dtoPage = usuariosPage.map(DadosListagemUsuarios::new);
+        return ResponseEntity.ok(dtoPage);
+    }
+
 }

@@ -1,15 +1,8 @@
 package SimulaEnem.controller;
 
 import SimulaEnem.domain.alternativas.Alternativas;
-
-import SimulaEnem.repository.AlternativasRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import SimulaEnem.service.AlternativasService;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,12 +10,14 @@ import java.util.List;
 @RequestMapping("alternativas")
 public class AlternativasController {
 
-    @Autowired
-    private AlternativasRepository alternativasRepository;
+    private final AlternativasService alternativasService;
+
+    public AlternativasController(AlternativasService alternativasService) {
+        this.alternativasService = alternativasService;
+    }
 
     @GetMapping("/idQuestao/{id}")
     public List<Alternativas> listarPorIdQuestao(@PathVariable Long id) {
-        return alternativasRepository.findByQuestaoIdOrderByLetterAsc(id);
+        return alternativasService.listarPorIdQuestao(id);
     }
-
 }
