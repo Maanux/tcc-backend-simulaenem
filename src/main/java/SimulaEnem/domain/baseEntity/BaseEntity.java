@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -15,8 +14,6 @@ import java.util.UUID;
 @Getter
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue
     @UuidGenerator
     @Column(name = "external_id", updatable = false, nullable = false, unique = true)
     private UUID externalId;

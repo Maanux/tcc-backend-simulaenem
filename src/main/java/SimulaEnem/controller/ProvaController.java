@@ -2,12 +2,14 @@ package SimulaEnem.controller;
 
 import SimulaEnem.dto.Prova.DadosParaCriarProva;
 import SimulaEnem.dto.Prova.DadosProvaCriada;
-import SimulaEnem.dto.questao.QuestaoCompletaDTO;
+import SimulaEnem.dto.Prova.ProvaQuestaoDTO;
 import SimulaEnem.service.ProvaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/provas")
@@ -23,12 +25,15 @@ public class ProvaController {
         return  ResponseEntity.ok(provaCriada);
     }
 
-    @GetMapping("/{provaId}/questao/{ordem}")
-    public ResponseEntity<QuestaoCompletaDTO> buscarQuestaoPorOrdem(@PathVariable Long provaId, @PathVariable Integer ordem) {
+    @GetMapping("/{provaUuid}/questao/{ordem}")
+    public ResponseEntity<ProvaQuestaoDTO> buscarQuestaoPorOrdem(
+            @PathVariable UUID provaUuid,
+            @PathVariable Integer ordem) {
 
-        QuestaoCompletaDTO questao = provaService.buscarQuestaoCompletaPorProvaIdEOrdem(provaId, ordem);
+        ProvaQuestaoDTO questao = provaService.buscarQuestaoCompletaPorProvaUuidEOrdem(provaUuid, ordem);
         return ResponseEntity.ok(questao);
     }
+
 
 }
 

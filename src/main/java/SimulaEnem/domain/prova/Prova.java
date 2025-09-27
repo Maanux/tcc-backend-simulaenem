@@ -1,5 +1,6 @@
 package SimulaEnem.domain.prova;
 
+import SimulaEnem.domain.baseEntity.BaseEntity;
 import SimulaEnem.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Prova {
+public class Prova  extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

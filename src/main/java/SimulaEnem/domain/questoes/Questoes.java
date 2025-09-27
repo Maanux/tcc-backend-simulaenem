@@ -1,24 +1,24 @@
 package SimulaEnem.domain.questoes;
 
 import SimulaEnem.domain.alternativas.Alternativas;
+import SimulaEnem.domain.baseEntity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
+
 @Entity
 @Table(name = "questoes")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Questoes {
+@Builder
+public class Questoes  extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
     private int index;
     private String discipline;
@@ -27,8 +27,9 @@ public class Questoes {
     @Column(columnDefinition = "TEXT")
     private String context;
 
-    @ElementCollection
-    private List<String> files;
+    @Column(columnDefinition = "text[]")
+    private String[] files;
+
     private char correctAlternative;
     @Column(columnDefinition = "TEXT")
     private String alternativesIntroduction;

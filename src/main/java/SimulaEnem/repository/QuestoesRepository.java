@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface QuestoesRepository extends JpaRepository<Questoes, Long> {
 
@@ -18,4 +20,6 @@ public interface QuestoesRepository extends JpaRepository<Questoes, Long> {
 
     @Query(value = "SELECT * FROM questoes ORDER BY RANDOM() LIMIT :quantidade", nativeQuery = true)
     List<Questoes> buscarQuestoesAleatorias(@Param("quantidade") int quantidade);
+
+    Optional<Questoes> findByExternalId(UUID externalId);
 }

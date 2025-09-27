@@ -6,6 +6,7 @@ import SimulaEnem.domain.prova.ProvaQuestao;
 import SimulaEnem.domain.questoes.Questoes;
 import SimulaEnem.domain.usuario.Usuario;
 import SimulaEnem.dto.Prova.DadosProvaCriada;
+import SimulaEnem.dto.Prova.ProvaQuestaoDTO;
 import SimulaEnem.dto.questao.QuestaoCompletaDTO;
 import SimulaEnem.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,17 +78,19 @@ public class ProvaService {
                     .toList();
 
             return new QuestaoCompletaDTO(
+                    q.getExternalId(),
                     q.getTitle(),
                     q.getDiscipline(),
                     q.getYear(),
                     q.getContext(),
-                    q.getFiles(),
+                    Arrays.asList(q.getFiles()),
                     q.getAlternativesIntroduction(),
                     alternativas
             );
         }).toList();
 
         return new DadosProvaCriada(
+                prova.getExternalId(),
                 prova.getTitulo(),
                 prova.getStatus(),
                 prova.getDataInicio(),
@@ -103,17 +107,19 @@ public class ProvaService {
                     .toList();
 
             return new QuestaoCompletaDTO(
+                    q.getExternalId(),
                     q.getTitle(),
                     q.getDiscipline(),
                     q.getYear(),
                     q.getContext(),
-                    q.getFiles(),
+                    Arrays.asList(q.getFiles()),
                     q.getAlternativesIntroduction(),
                     alternativas
             );
         }).toList();
 
         return new DadosProvaCriada(
+                prova.getExternalId(),
                 prova.getTitulo(),
                 prova.getStatus(),
                 prova.getDataInicio(),
@@ -121,7 +127,7 @@ public class ProvaService {
         );
     }
 
-    public QuestaoCompletaDTO buscarQuestaoCompletaPorProvaIdEOrdem(Long provaId, Integer ordem) {
+    public ProvaQuestaoDTO buscarQuestaoCompletaPorProvaIdEOrdem(Long provaId, Integer ordem) {
         ProvaQuestao provaQuestao = provaQuestaoRepository.findByProvaIdAndOrdem(provaId, ordem)
                 .orElseThrow(() -> new ValidacaoException("Questão não encontrada na prova."));
 
@@ -137,15 +143,63 @@ public class ProvaService {
                 ))
                 .toList();
 
-        return new QuestaoCompletaDTO(
+
+        QuestaoCompletaDTO questaoCompletaDTO = new QuestaoCompletaDTO(
+                questao.getExternalId(),
                 questao.getTitle(),
                 questao.getDiscipline(),
                 questao.getYear(),
                 questao.getContext(),
-                questao.getFiles(),
+                Arrays.asList(questao.getFiles()),
                 questao.getAlternativesIntroduction(),
                 alternativas
         );
+
+
+        return new ProvaQuestaoDTO(
+                provaQuestao.getProva().getExternalId(),
+                provaQuestao.getOrdem(),
+                provaQuestao.getAlternativaRespondida(),
+                provaQuestao.getTempoGasto(),
+                questaoCompletaDTO
+        );
     }
+
+    public ProvaQuestaoDTO buscarQuestaoCompletaPorProvaUuidEOrdem(UUID provaUuid, Integer ordem) {
+        ProvaQuestao provaQuestao = provaQuestaoRepository.findByProva_ExternalIdAndOrdem(provaUuid, ordem)
+                .orElseThrow(() -> new ValidacaoException("Questão não encontrada na prova."));
+
+        Questoes questao = provaQuestao.getQuestao();
+
+        List<QuestaoCompletaDTO.AlternativaDTO> alternativas = questao.getAlternativas()
+                .stream()
+                .map(a -> new QuestaoCompletaDTO.AlternativaDTO(
+                        a.getLetter(),
+                        a.getText(),
+                        a.getFile(),
+                        a.isCorrect()
+                ))
+                .toList();
+
+        QuestaoCompletaDTO questaoCompletaDTO = new QuestaoCompletaDTO(
+                questao.getExternalId(),
+                questao.getTitle(),
+                questao.getDiscipline(),
+                questao.getYear(),
+                questao.getContext(),
+                Arrays.asList(questao.getFiles()),
+                questao.getAlternativesIntroduction(),
+                alternativas
+        );
+
+        return new ProvaQuestaoDTO(
+                provaQuestao.getProva().getExternalId(),
+                provaQuestao.getOrdem(),
+                provaQuestao.getAlternativaRespondida(),
+                provaQuestao.getTempoGasto(),
+                questaoCompletaDTO
+        );
+    }
+
 
 }

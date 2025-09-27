@@ -5,9 +5,9 @@ import SimulaEnem.dto.questao.QuestaoCompletaDTO;
 import SimulaEnem.repository.AlternativasRepository;
 import SimulaEnem.repository.QuestoesRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +30,12 @@ public class QuestaoService {
                 .toList();
 
         return new QuestaoCompletaDTO(
+                questao.getExternalId(),
                 questao.getTitle(),
                 questao.getDiscipline(),
                 questao.getYear(),
                 questao.getContext(),
-                questao.getFiles(),
+                Arrays.asList(questao.getFiles()),
                 questao.getAlternativesIntroduction(),
                 alternativas
         );

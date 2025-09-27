@@ -1,8 +1,10 @@
 package SimulaEnem.dto.questao;
 
 import java.util.List;
+import java.util.UUID;
 
 public record QuestaoCompletaDTO(
+        UUID externalId,
         String title,
         String discipline,
         int year,
