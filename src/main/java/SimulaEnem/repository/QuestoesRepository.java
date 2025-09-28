@@ -22,4 +22,13 @@ public interface QuestoesRepository extends JpaRepository<Questoes, Long> {
     List<Questoes> buscarQuestoesAleatorias(@Param("quantidade") int quantidade);
 
     Optional<Questoes> findByExternalId(UUID externalId);
+
+    @Query(value = "SELECT * FROM questoes WHERE discipline = :discipline ORDER BY RANDOM() LIMIT :quantidade", nativeQuery = true)
+    List<Questoes> buscarQuestoesAleatoriasPorDisciplina(@Param("discipline") String discipline,
+                                                         @Param("quantidade") int quantidade);
+    @Query(value = "SELECT * FROM questoes WHERE discipline = :discipline AND language = :language ORDER BY RANDOM() LIMIT :quantidade", nativeQuery = true)
+    List<Questoes> buscarQuestoesAleatoriasPorDisciplinaEIdioma(@Param("discipline") String discipline,
+                                                                @Param("language") String language,
+                                                                @Param("quantidade") int quantidade);
+
 }

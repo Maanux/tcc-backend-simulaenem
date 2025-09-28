@@ -1,14 +1,13 @@
 package SimulaEnem.controller;
 
-import SimulaEnem.dto.Prova.DadosParaCriarProva;
-import SimulaEnem.dto.Prova.DadosProvaCriada;
-import SimulaEnem.dto.Prova.ProvaQuestaoDTO;
+import SimulaEnem.dto.Prova.*;
 import SimulaEnem.service.ProvaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,10 +18,17 @@ public class ProvaController {
     @Autowired
     private final ProvaService provaService;
 
-    @PostMapping("/criar")
+    @PostMapping("/criaraleatoria")
     public ResponseEntity<DadosProvaCriada> criarProva(@RequestBody DadosParaCriarProva dadosParaCriarProva) {
         DadosProvaCriada provaCriada = provaService.criarProvaAleatoria(dadosParaCriarProva.externalId(), dadosParaCriarProva.quantidadeQuestoes());
         return  ResponseEntity.ok(provaCriada);
+    }
+
+    @PostMapping("/criarpordisciplina")
+    public ResponseEntity<DadosProvaCriada> criarProvaPorDisciplina(
+            @RequestBody DadosParaCriarProvaPorDisciplina dados) {
+        DadosProvaCriada provaCriada = provaService.criarProvaPorDisciplina(dados);
+        return ResponseEntity.ok(provaCriada);
     }
 
     @GetMapping("/{provaUuid}/questao/{ordem}")
@@ -33,6 +39,12 @@ public class ProvaController {
         ProvaQuestaoDTO questao = provaService.buscarQuestaoCompletaPorProvaUuidEOrdem(provaUuid, ordem);
         return ResponseEntity.ok(questao);
     }
+
+    @GetMapping("/{provaExternalId}/questoes")
+    public List<QuestaoResolvidaDTO> listarQuestoesDaProva(@PathVariable UUID provaExternalId) {
+        return provaService.listarQuestoesDaProva(provaExternalId);
+    }
+
 
 
 }
