@@ -48,19 +48,19 @@ public class UsuarioController {
         return usuarioService.listarAtivos();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid DadosAtualizacaoUsuario dados) {
-        return usuarioService.atualizarUsuario(id, dados);
+    @PutMapping("/{externalId}")
+    public ResponseEntity<?> atualizar(@PathVariable UUID externalId, @RequestBody @Valid DadosAtualizacaoUsuario dados) {
+        return usuarioService.atualizarUsuario(externalId, dados);
     }
 
-    @PutMapping("/reativar/{id}")
-    public ResponseEntity<?> reativar(@PathVariable Long id) {
-        return usuarioService.reativar(id);
+    @PutMapping("/reativar/{externalId}")
+    public ResponseEntity<?> reativar(@PathVariable UUID externalId) {
+        return usuarioService.reativar(externalId);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> desativar(@PathVariable Long id) {
-        return usuarioService.desativar(id);
+    @DeleteMapping("/{externalId}")
+    public ResponseEntity<?> desativar(@PathVariable UUID externalId) {
+        return usuarioService.desativar(externalId);
     }
 
 }

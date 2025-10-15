@@ -304,6 +304,7 @@ public class ProvaService {
                             pq.getOrdem(),
                             questaoDTO,
                             String.valueOf(pq.getAlternativaRespondida()),
+                            pq.getTempoGasto().getSeconds(),
                             pq.getCorreta()
                     );
                 })

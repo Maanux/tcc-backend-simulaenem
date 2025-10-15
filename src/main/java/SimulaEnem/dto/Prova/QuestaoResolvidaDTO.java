@@ -6,6 +6,7 @@ public record QuestaoResolvidaDTO(
         Integer ordem,
         QuestaoCompletaDTO questaoCompletaDTO,
         String alternativaRespondida,
+        Long tempoGasto,
         boolean correta
 ) {
 }

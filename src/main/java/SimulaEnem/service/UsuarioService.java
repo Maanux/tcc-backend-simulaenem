@@ -52,8 +52,8 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public ResponseEntity<?> atualizarUsuario(Long id, DadosAtualizacaoUsuario dados) {
-        return usuarioRepository.findById(id).map(usuario -> {
+    public ResponseEntity<?> atualizarUsuario(UUID externalId, DadosAtualizacaoUsuario dados) {
+        return usuarioRepository.findByExternalId(externalId).map(usuario -> {
 
             if (dados.nome() != null) usuario.setNome(dados.nome());
             if (dados.sobrenome() != null) usuario.setSobrenome(dados.sobrenome());
@@ -88,8 +88,8 @@ public class UsuarioService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<?> reativar(Long id) {
-        return usuarioRepository.findById(id).map(usuario -> {
+    public ResponseEntity<?> reativar(UUID externalId) {
+        return usuarioRepository.findByExternalId(externalId).map(usuario -> {
             usuario.setAtivo(true);
             usuario.setDeletedAt(null);
             usuarioRepository.save(usuario);
@@ -99,8 +99,8 @@ public class UsuarioService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<?> desativar(Long id) {
-        return usuarioRepository.findById(id).map(usuario -> {
+    public ResponseEntity<?> desativar(UUID externalId) {
+        return usuarioRepository.findByExternalId(externalId).map(usuario -> {
             usuario.setAtivo(false);
             usuario.setDeletedAt(LocalDateTime.now());
             usuarioRepository.save(usuario);

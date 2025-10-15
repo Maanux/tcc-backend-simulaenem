@@ -26,58 +26,6 @@ public class ProvaQuestaoService {
         this.provaRepository = provaRepository;
     }
 
-//    public RespostaDTO responderQuestao(UUID provaUuid, UUID questaoUuid, ResponderQuestaoDTO respostaRequest) {
-//        var prova = provaRepository.findByExternalId(provaUuid)
-//                .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
-//
-//        var questao = questoesRepository.findByExternalId(questaoUuid)
-//                .orElseThrow(() -> new RuntimeException("Questão não encontrada"));
-//
-//        boolean correta = String.valueOf(questao.getCorrectAlternative())
-//                .equalsIgnoreCase(respostaRequest.alternativaRespondidada());
-//
-//        ProvaQuestao provaQuestao = new ProvaQuestao();
-//        provaQuestao.setProva(prova);
-//        provaQuestao.setQuestao(questao);
-//        provaQuestao.setOrdem(provaQuestao.getOrdem()); //arrumar a ordem da questao
-//        provaQuestao.setAlternativaRespondida(respostaRequest.alternativaRespondidada().charAt(0));
-//        provaQuestao.setCorreta(correta);
-//        provaQuestao.setTempoGasto(Duration.ofSeconds(respostaRequest.tempoGasto()));
-//
-//        provaQuestaoRepository.save(provaQuestao);
-//
-//        return new RespostaDTO(questao.getExternalId(),provaQuestao.getOrdem(), respostaRequest.alternativaRespondidada(), correta); //arrumar ordem
-//    }
-
-//    public RespostaDTO responderQuestao(UUID provaUuid, UUID questaoUuid, ResponderQuestaoDTO respostaRequest) {
-//        var prova = provaRepository.findByExternalId(provaUuid)
-//                .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
-//
-//        var questao = questoesRepository.findByExternalId(questaoUuid)
-//                .orElseThrow(() -> new RuntimeException("Questão não encontrada"));
-//
-//        var provaQuestao = provaQuestaoRepository
-//                .findByProvaExternalIdAndQuestaoExternalId(provaUuid, questaoUuid)
-//                .orElseThrow(() -> new RuntimeException("Questão não vinculada a esta prova"));
-//
-//        boolean correta = String.valueOf(questao.getCorrectAlternative())
-//                .equalsIgnoreCase(respostaRequest.alternativaRespondidada());
-//
-//        provaQuestao.setAlternativaRespondida(respostaRequest.alternativaRespondidada().charAt(0));
-//        provaQuestao.setCorreta(correta);
-//        provaQuestao.setTempoGasto(Duration.ofSeconds(respostaRequest.tempoGasto()));
-//
-//        provaQuestaoRepository.save(provaQuestao);
-//
-//        return new RespostaDTO(
-//                questao.getExternalId(),
-//                provaQuestao.getOrdem(),
-//                respostaRequest.alternativaRespondidada(),
-//                correta
-//        );
-//
-//    }
-
     public RespostaDTO responderQuestao(UUID provaUuid, UUID questaoUuid, ResponderQuestaoDTO respostaRequest) {
         var prova = provaRepository.findByExternalId(provaUuid)
                 .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
@@ -88,7 +36,6 @@ public class ProvaQuestaoService {
         boolean correta = String.valueOf(questao.getCorrectAlternative())
                 .equalsIgnoreCase(respostaRequest.alternativaRespondidada());
 
-        // 🔎 Verifica se já existe esse vínculo (prova + questão)
         var provaQuestao = provaQuestaoRepository.findByProvaExternalIdAndQuestaoExternalId(provaUuid, questaoUuid)
                 .orElseGet(() -> {
                     ProvaQuestao nova = new ProvaQuestao();
@@ -97,7 +44,6 @@ public class ProvaQuestaoService {
                     return nova;
                 });
 
-        // Atualiza resposta
         provaQuestao.setAlternativaRespondida(respostaRequest.alternativaRespondidada().charAt(0));
         provaQuestao.setCorreta(correta);
         provaQuestao.setTempoGasto(Duration.ofSeconds(respostaRequest.tempoGasto()));
