@@ -1,0 +1,1 @@
+ALTER TABLE provas ADD COLUMN ultima_questao_ordem INTEGER DEFAULT 0;

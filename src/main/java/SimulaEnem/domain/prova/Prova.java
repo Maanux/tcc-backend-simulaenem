@@ -36,8 +36,8 @@ public class Prova  extends BaseEntity {
     @Column(name = "tempo_total")
     private Duration tempoTotal;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StatusProva status;
 
     @Column(name = "ultima_atividade")
     private LocalDateTime ultimaAtividade;
@@ -46,6 +46,10 @@ public class Prova  extends BaseEntity {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @Column(name = "ultima_questao_ordem")
+    private Integer ultimaQuestaoOrdem = 0;
+
     @OneToMany(mappedBy = "prova", cascade = CascadeType.ALL)
     private List<ProvaQuestao> questoes;
+
 }

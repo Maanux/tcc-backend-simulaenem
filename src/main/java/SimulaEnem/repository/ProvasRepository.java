@@ -12,7 +12,9 @@ import java.util.UUID;
 public interface ProvasRepository  extends JpaRepository<Prova, Long> {
 
     List<Prova> findByUsuarioExternalId(UUID usuarioExternalId);
+
     Page<Prova> findByUsuarioExternalId(UUID usuarioExternalId, Pageable pageable);
+
     Optional<Prova> findByExternalIdAndUsuarioExternalId(UUID provaExternalId, UUID usuarioExternalId);
 
 }

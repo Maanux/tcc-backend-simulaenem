@@ -17,5 +17,9 @@ public interface ProvaQuestaoRepository extends JpaRepository<ProvaQuestao, Long
 
     List<ProvaQuestao> findByProva_ExternalId(UUID externalId);
 
+    long countByProvaExternalId(UUID provaExternalId);
+
+    List<ProvaQuestao> findAllByProvaExternalId(UUID provaExternalId);
+
 
 }

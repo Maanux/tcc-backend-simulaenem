@@ -27,12 +27,6 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-//    @PostMapping
-//    public ResponseEntity<?> cadastrar(@RequestBody @Valid DadosCadastroUsuario dados) {
-//        var usuario = usuarioService.cadastrar(dados);
-//        return ResponseEntity.ok(usuario);
-//    }
-
     @GetMapping("/{externalId}")
     public ResponseEntity<Usuario> listarUsuarioPorExternalId(@PathVariable UUID externalId) {
         return usuarioService.buscarPorExternalId(externalId);

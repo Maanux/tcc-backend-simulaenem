@@ -4,8 +4,9 @@ import java.util.UUID;
 
 public record RespostaDTO(
         UUID questaoUuid,
-        Integer ordem, //arrumar dps
+        Integer ordem,
         String alternativaRespondida,
-        boolean correta
+        boolean correta,
+        Long tempoTotalGasto
 ) {
 }

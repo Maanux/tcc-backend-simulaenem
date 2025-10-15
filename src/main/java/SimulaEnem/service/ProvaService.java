@@ -3,6 +3,7 @@ package SimulaEnem.service;
 import SimulaEnem.domain.ValidacaoException;
 import SimulaEnem.domain.prova.Prova;
 import SimulaEnem.domain.prova.ProvaQuestao;
+import SimulaEnem.domain.prova.StatusProva;
 import SimulaEnem.domain.questoes.Questoes;
 import SimulaEnem.domain.usuario.Usuario;
 import SimulaEnem.dto.Prova.DadosParaCriarProvaPorDisciplina;
@@ -47,7 +48,7 @@ public class ProvaService {
 
         Prova prova = new Prova();
         prova.setTitulo("Prova gerada automaticamente");
-        prova.setStatus("em_andamento");
+        prova.setStatus(StatusProva.EM_ANDAMENTO);
         prova.setDataInicio(LocalDateTime.now());
         prova.setUltimaAtividade(LocalDateTime.now());
         prova.setUsuario(usuario);
@@ -91,7 +92,7 @@ public class ProvaService {
         return new DadosProvaCriada(
                 prova.getExternalId(),
                 prova.getTitulo(),
-                prova.getStatus(),
+                prova.getStatus().name(),
                 prova.getDataInicio(),
                 questoesDTO
         );
@@ -103,7 +104,7 @@ public class ProvaService {
 
         Prova prova = new Prova();
         prova.setTitulo("Prova gerada automaticamente");
-        prova.setStatus("em_andamento");
+        prova.setStatus(StatusProva.EM_ANDAMENTO);
         prova.setDataInicio(LocalDateTime.now());
         prova.setUltimaAtividade(LocalDateTime.now());
         prova.setUsuario(usuario);
@@ -169,7 +170,7 @@ public class ProvaService {
                     );
                 }).toList();
 
-        return new DadosProvaCriada(prova.getExternalId(), prova.getTitulo(), prova.getStatus(),
+        return new DadosProvaCriada(prova.getExternalId(), prova.getTitulo(), prova.getStatus().name(),
                 prova.getDataInicio(), questoesDTO);
     }
 
@@ -195,7 +196,7 @@ public class ProvaService {
         return new DadosProvaCriada(
                 prova.getExternalId(),
                 prova.getTitulo(),
-                prova.getStatus(),
+                prova.getStatus().name(),
                 prova.getDataInicio(),
                 questoesDTO
         );

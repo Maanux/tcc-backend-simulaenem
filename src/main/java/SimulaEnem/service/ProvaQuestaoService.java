@@ -1,14 +1,16 @@
 package SimulaEnem.service;
 
 import SimulaEnem.domain.prova.ProvaQuestao;
-import SimulaEnem.dto.Prova.ResponderQuestaoDTO;
-import SimulaEnem.dto.Prova.RespostaDTO;
+import SimulaEnem.domain.prova.StatusProva;
+import SimulaEnem.dto.Prova.*;
 import SimulaEnem.repository.ProvaQuestaoRepository;
 import SimulaEnem.repository.ProvaRepository;
 import SimulaEnem.repository.QuestoesRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -26,6 +28,7 @@ public class ProvaQuestaoService {
         this.provaRepository = provaRepository;
     }
 
+    @Transactional
     public RespostaDTO responderQuestao(UUID provaUuid, UUID questaoUuid, ResponderQuestaoDTO respostaRequest) {
         var prova = provaRepository.findByExternalId(provaUuid)
                 .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
@@ -41,22 +44,175 @@ public class ProvaQuestaoService {
                     ProvaQuestao nova = new ProvaQuestao();
                     nova.setProva(prova);
                     nova.setQuestao(questao);
+                    nova.setTempoGasto(Duration.ZERO);
                     return nova;
                 });
 
+
+        Duration tempoAnterior = provaQuestao.getTempoGasto() != null
+                ? provaQuestao.getTempoGasto()
+                : Duration.ZERO;
+
+        Duration novoTempo = Duration.ofSeconds(respostaRequest.tempoGasto());
+        Duration tempoTotal = tempoAnterior.plus(novoTempo);
+
         provaQuestao.setAlternativaRespondida(respostaRequest.alternativaRespondidada().charAt(0));
         provaQuestao.setCorreta(correta);
-        provaQuestao.setTempoGasto(Duration.ofSeconds(respostaRequest.tempoGasto()));
+        provaQuestao.setTempoGasto(tempoTotal);
 
         provaQuestaoRepository.save(provaQuestao);
+
+
+        if (provaQuestao.getOrdem() != null && provaQuestao.getOrdem() > prova.getUltimaQuestaoOrdem()) {
+            prova.setUltimaQuestaoOrdem(provaQuestao.getOrdem());
+            prova.setUltimaAtividade(LocalDateTime.now());
+            provaRepository.save(prova);
+        }
 
         return new RespostaDTO(
                 questao.getExternalId(),
                 provaQuestao.getOrdem(),
                 respostaRequest.alternativaRespondidada(),
-                correta
+                correta,
+                tempoTotal.getSeconds()
         );
+    }
+    @Transactional
+    public CheckpointProvaDTO pausarProva(UUID provaUuid, PausarProvaDTO dados) {
+        var prova = provaRepository.findByExternalId(provaUuid)
+                .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
 
+        prova.setStatus(StatusProva.PAUSADA);
+        prova.setUltimaAtividade(LocalDateTime.now());
+
+        if (dados.ultimaQuestaoRespondida() != null) {
+            prova.setUltimaQuestaoOrdem(dados.ultimaQuestaoRespondida());
+        }
+
+        provaRepository.save(prova);
+
+        long totalQuestoes = provaQuestaoRepository.countByProvaExternalId(provaUuid);
+
+        return new CheckpointProvaDTO(
+                prova.getExternalId(),
+                prova.getTitulo(),
+                "PAUSADA",
+                prova.getUltimaQuestaoOrdem(),
+                prova.getUltimaQuestaoOrdem() + 1,
+                (int) totalQuestoes,
+                prova.getTempoTotal() != null ? prova.getTempoTotal().getSeconds() : 0L,
+                "Prova pausada com sucesso"
+        );
     }
 
+    public CheckpointProvaDTO retomarProva(UUID provaUuid) {
+        var prova = provaRepository.findByExternalId(provaUuid)
+                .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
+
+        if (prova.getStatus() == StatusProva.FINALIZADA) {
+            throw new RuntimeException("Esta prova já foi finalizada");
+        }
+
+        prova.setStatus(StatusProva.EM_ANDAMENTO);
+        prova.setUltimaAtividade(LocalDateTime.now());
+        provaRepository.save(prova);
+
+        long totalQuestoes = provaQuestaoRepository.countByProvaExternalId(provaUuid);
+
+        Integer proximaQuestao = prova.getUltimaQuestaoOrdem() + 1;
+
+        return new CheckpointProvaDTO(
+                prova.getExternalId(),
+                prova.getTitulo(),
+                "EM_ANDAMENTO",
+                prova.getUltimaQuestaoOrdem(),
+                proximaQuestao,
+                (int) totalQuestoes,
+                prova.getTempoTotal() != null ? prova.getTempoTotal().getSeconds() : 0L,
+                String.format("Retomando da questão %d", proximaQuestao)
+        );
+    }
+
+    public CheckpointProvaDTO obterStatusProva(UUID provaUuid) {
+        var prova = provaRepository.findByExternalId(provaUuid)
+                .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
+
+        long totalQuestoes = provaQuestaoRepository.countByProvaExternalId(provaUuid);
+
+        Integer ultima = (prova.getUltimaQuestaoOrdem() != null) ? prova.getUltimaQuestaoOrdem() : 0;
+        Integer proximaQuestao = ultima + 1;
+
+        if (proximaQuestao > totalQuestoes) {
+            proximaQuestao = (int) totalQuestoes;
+        }
+
+        String mensagem;
+        if (ultima == 0) {
+            mensagem = "Prova não iniciada. Comece pela questão 1";
+        } else if (prova.getStatus() == StatusProva.PAUSADA) {
+            mensagem = String.format("Prova pausada na questão %d", ultima);
+        } else {
+            mensagem = String.format("Continue da questão %d", proximaQuestao);
+        }
+
+        return new CheckpointProvaDTO(
+                prova.getExternalId(),
+                prova.getTitulo(),
+                prova.getStatus().name(),
+                ultima,
+                proximaQuestao,
+                (int) totalQuestoes,
+                prova.getTempoTotal() != null ? prova.getTempoTotal().getSeconds() : 0L,
+                mensagem
+        );
+    }
+
+
+    @Transactional
+    public ResultadoProvaDTO finalizarProva(UUID provaUuid) {
+        var prova = provaRepository.findByExternalId(provaUuid)
+                .orElseThrow(() -> new RuntimeException("Prova não encontrada"));
+
+        if (prova.getStatus() == StatusProva.FINALIZADA) {
+            throw new RuntimeException("Esta prova já foi finalizada anteriormente");
+        }
+
+        var questoesRespondidas = provaQuestaoRepository.findAllByProvaExternalId(provaUuid);
+
+        long totalQuestoes = questoesRespondidas.size();
+        long acertos = questoesRespondidas.stream()
+                .filter(ProvaQuestao::getCorreta)
+                .count();
+        long erros = totalQuestoes - acertos;
+
+        Duration tempoTotalGasto = questoesRespondidas.stream()
+                .map(ProvaQuestao::getTempoGasto)
+                .filter(tempo -> tempo != null)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        prova.setStatus(StatusProva.FINALIZADA);
+        prova.setDataFim(LocalDateTime.now());
+        prova.setTempoTotal(tempoTotalGasto);
+        prova.setUltimaAtividade(LocalDateTime.now());
+
+        provaRepository.save(prova);
+
+        double porcentagemAcerto = totalQuestoes > 0
+                ? (acertos * 100.0) / totalQuestoes
+                : 0.0;
+
+        return new ResultadoProvaDTO(
+                prova.getExternalId(),
+                prova.getTitulo(),
+                (int) totalQuestoes,
+                (int) acertos,
+                (int) erros,
+                porcentagemAcerto,
+                tempoTotalGasto.getSeconds(),
+                prova.getDataInicio(),
+                prova.getDataFim(),
+                "Prova finalizada com sucesso!"
+        );
+    }
 }
+
