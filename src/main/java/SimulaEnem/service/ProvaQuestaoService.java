@@ -77,6 +77,7 @@ public class ProvaQuestaoService {
                 tempoTotal.getSeconds()
         );
     }
+
     @Transactional
     public CheckpointProvaDTO pausarProva(UUID provaUuid, PausarProvaDTO dados) {
         var prova = provaRepository.findByExternalId(provaUuid)
@@ -85,8 +86,19 @@ public class ProvaQuestaoService {
         prova.setStatus(StatusProva.PAUSADA);
         prova.setUltimaAtividade(LocalDateTime.now());
 
+        // Atualiza última questão respondida
         if (dados.ultimaQuestaoRespondida() != null) {
             prova.setUltimaQuestaoOrdem(dados.ultimaQuestaoRespondida());
+        }
+
+        // Atualiza tempo total gasto
+        if (dados.tempoGasto() != null) {
+            Duration tempoAtual = prova.getTempoTotal() != null
+                    ? prova.getTempoTotal()
+                    : Duration.ZERO;
+
+            Duration novoTempo = Duration.ofSeconds(dados.tempoGasto());
+            prova.setTempoTotal(tempoAtual.plus(novoTempo));
         }
 
         provaRepository.save(prova);
@@ -98,10 +110,10 @@ public class ProvaQuestaoService {
                 prova.getTitulo(),
                 "PAUSADA",
                 prova.getUltimaQuestaoOrdem(),
-                prova.getUltimaQuestaoOrdem() + 1,
+                prova.getUltimaQuestaoOrdem(), // ← MUDOU: próxima = mesma questão
                 (int) totalQuestoes,
                 prova.getTempoTotal() != null ? prova.getTempoTotal().getSeconds() : 0L,
-                "Prova pausada com sucesso"
+                String.format("Prova pausada na questão %d", prova.getUltimaQuestaoOrdem())
         );
     }
 
@@ -181,8 +193,9 @@ public class ProvaQuestaoService {
 
         long totalQuestoes = questoesRespondidas.size();
         long acertos = questoesRespondidas.stream()
-                .filter(ProvaQuestao::getCorreta)
+                .filter(q -> Boolean.TRUE.equals(q.getCorreta()))
                 .count();
+
         long erros = totalQuestoes - acertos;
 
         Duration tempoTotalGasto = questoesRespondidas.stream()

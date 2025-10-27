@@ -1,5 +1,7 @@
 package SimulaEnem.dto.Prova;
 
+import SimulaEnem.domain.prova.StatusProva;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -8,6 +10,7 @@ public record ProvasDTO(
         String titulo,
         LocalDateTime dataInicio,
         LocalDateTime dataFim,
-        int totalQuestoes
+        int totalQuestoes,
+        StatusProva statusProva
 ) {
 }

@@ -28,8 +28,8 @@ public class ProvaQuestaoController {
     @PostMapping("/{provaUuid}/pausar")
     public ResponseEntity<CheckpointProvaDTO> pausarProva(
             @PathVariable UUID provaUuid,
-            @RequestBody(required = false) PausarProvaDTO dados) {
-        CheckpointProvaDTO checkpoint = provaQuestaoService.pausarProva(provaUuid, dados != null ? dados : new PausarProvaDTO(null));
+            @RequestBody PausarProvaDTO dados) {
+        CheckpointProvaDTO checkpoint = provaQuestaoService.pausarProva(provaUuid, dados);
         return ResponseEntity.ok(checkpoint);
     }
 

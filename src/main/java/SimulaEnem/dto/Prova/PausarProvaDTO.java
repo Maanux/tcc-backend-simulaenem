@@ -1,5 +1,6 @@
 package SimulaEnem.dto.Prova;
 
 public record PausarProvaDTO(
-        Integer ultimaQuestaoRespondida
+        Integer ultimaQuestaoRespondida,
+        Long tempoGasto
 ) {}

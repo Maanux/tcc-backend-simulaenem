@@ -42,7 +42,8 @@ public class ProvasService {
                 p.getTitulo(),
                 p.getDataInicio(),
                 p.getDataFim(),
-                p.getQuestoes() == null ? 0 : p.getQuestoes().size()
+                p.getQuestoes() == null ? 0 : p.getQuestoes().size(),
+                p.getStatus()
         );
     }
 }

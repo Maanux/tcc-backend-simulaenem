@@ -69,12 +69,14 @@ public class EstatisticasProvaService {
         return new EstatisticasProvaDTO(
                 prova.getExternalId(),
                 prova.getTitulo(),
+                prova.getDataInicio(),
+                prova.getDataFim(),
                 prova.getStatus().name(),
                 totalQuestoes,
                 (int) questoesRespondidas,
                 (int) acertos,
                 (int) erros,
-                Math.round(aproveitamento * 100.0) / 100.0, // 2 casas decimais
+                Math.round(aproveitamento * 100.0) / 100.0,
                 tempoTotal.getSeconds(),
                 comparativo
         );
